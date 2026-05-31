@@ -16,18 +16,13 @@ BLINK='\033[5m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-# ==========================================
-#  ROOT CHECK
-# ==========================================
+# ROOT CHECK
 if [ "$EUID" -ne 0 ]; then
   echo -e "${RED}${BLINK}[✗] PLEASE RUN AS ROOT (sudo bash installer.sh)${NC}"
   exit 1
 fi
 
-# ==========================================
-#  FUNCTIONS
-# ==========================================
-
+# FUNCTIONS
 spinner() {
   local pid=$1
   local delay=0.1
@@ -58,52 +53,27 @@ warning() {
   echo -e "${YELLOW}[!] $1${NC}"
 }
 
-# ==========================================
-#  HEADER
-# ==========================================
+# HEADER
 header() {
   clear
   echo -e "${MAGENTA}"
   cat << 'EOF'
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                                                                           ║
-║     JJJJJJJJJJJ    AAAAPPPPPPPPPPPPPP   NNNNNNNNNNNNNNNN   EEEEEEEEEEE    ║
-║        JJJ        AAAAPPPPPPPPPPPPPP   NNNNNNNNNNNNNNNNNNN   EEEEEEEEEEE    ║
-║        JJJ       AAPPPPPPPPPPPPPPPP    NNNNNNNNNNNNNNNNNNN   EEEEEEEEEEE    ║
-║        JJJ      AAPPPP    PPPPPP     NNNNN     NNNNNNN   EEE          ║
-║        JJJ     AAPPPPP   PPPPPP      NNNNN     NNNNNNN   EEEEEEEE      ║
-║        JJJ    AAPPPPPPP  PPPPPP      NNNNN     NNNNNNN   EEEEEEEE      ║
-║        JJJ   AAPPPPPPPPPPPPPP       NNNNN     NNNNNNN   EEEEEEEE      ║
-║        JJJ   AAPPPPPPPPPPPPPP       NNNNN     NNNNNNN   EEE          ║
-║     JJJJJJJ   AAPPPPP     PPPPPP    NNNNN     NNNNNNN   EEEEEEEEEEE    ║
-║     JJJJJJ    AAAAPP       PPPPPP   NNNNN     NNNNNNN   EEEEEEEEEEE    ║
-║                                                                           ║
-║                     NNNNNNNNNN     EEEEEEEEEEE   TTTTTTTTTTTTTTT      ║
-║                     NNNNNNNNNN     EEEEEEEEEEE   TTTTTTTTTTTTTTT      ║
-║                     NNNNNNNNNN     EEEEEEEEEEE   TTTTTTTTTTTTTTT      ║
-║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
-║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
-║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
-║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
-║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
-║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
-║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
-║                                                                           ║
-║                         NETWORK                                      ║
-║                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════╝
+  ██████╗ ███████╗████████╗██████╗  ██████╗ 
+  ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔═══██╗
+  ██║  ██║█████╗     ██║   ██████╔╝██║   ██║
+  ██║  ██║██╔══╝     ██║   ██╔══██╗██║   ██║
+  ██████╔╝███████╗   ██║   ██║  ██║╚██████╔╝
+  ╚═════╝ ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ 
 EOF
-  echo -e "${CYAN}═══════════════════════════════════════════════════════════════════════════${NC}"
-  echo -e "${WHITE}${BOLD}                      JAPNEET NETWORK INSTALLER                       ${NC}"
-  echo -e "${CYAN}═══════════════════════════════════════════════════════════════════════════${NC}"
+  echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
+  echo -e "${WHITE}${BOLD}              JAPNEET NETWORK                ${NC}"
+  echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
   echo ""
 }
 
-# ==========================================
-#  SYSTEM INFO
-# ==========================================
+# SYSTEM INFO
 system_info() {
-  echo -e "${MAGENTA}███████████████████████████ SYSTEM INFORMATION ███████████████████████████${NC}"
+  echo -e "${MAGENTA}▓▓▓▓▓▓▓▓▓▓▓ SYSTEM INFORMATION ▓▓▓▓▓▓▓▓▓▓▓${NC}"
   echo ""
   echo -e "  ${WHITE}OS:${NC}       $(grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '"')"
   echo -e "  ${WHITE}Kernel:${NC}   $(uname -r)"
@@ -114,11 +84,9 @@ system_info() {
   echo ""
 }
 
-# ==========================================
-#  MAIN MENU
-# ==========================================
+# MAIN MENU
 main_menu() {
-  echo -e "${MAGENTA}███████████████████████████████ MAIN MENU █████████████████████████████${NC}"
+  echo -e "${MAGENTA}▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ MAIN MENU ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓${NC}"
   echo ""
   echo -e "  ${CYAN}[1]${NC} ${WHITE}INSTALL PANEL${NC}              - Setup game panel"
   echo -e "  ${CYAN}[2]${NC} ${WHITE}INSTALL JAVA 21${NC}            - Java runtime"
@@ -130,13 +98,11 @@ main_menu() {
   echo ""
 }
 
-# ==========================================
-#  OPTIONAL PACKAGES MENU
-# ==========================================
+# OPTIONAL PACKAGES
 optional_packages_menu() {
   while true; do
     clear
-    echo -e "${MAGENTA}█████████████████████ OPTIONAL PACKAGES █████████████████████${NC}"
+    echo -e "${MAGENTA}═══════════════════════════ OPTIONAL PACKAGES ═════════════════════${NC}"
     echo ""
     echo -e "  ${CYAN}[1]${NC} ${WHITE}DOCKER & DOCKER COMPOSE${NC}"
     echo -e "  ${CYAN}[2]${NC} ${WHITE}NGINX WEB SERVER${NC}"
@@ -147,7 +113,7 @@ optional_packages_menu() {
     echo -e "  ${CYAN}[7]${NC} ${WHITE}HTOP MONITOR${NC}"
     echo -e "  ${CYAN}[8]${NC} ${WHITE}UPDATE SYSTEM${NC}"
     echo -e "  ${CYAN}[9]${NC} ${WHITE}PYTHON 3 & PIP${NC}"
-    echo -e "  ${CYAN}[10]${NC} ${WHITE}GO BACK TO MAIN MENU${NC}"
+    echo -e "  ${CYAN}[10]${NC} ${WHITE}GO BACK${NC}"
     echo ""
     
     read -p "  ${CYAN}Select =>${NC} " pkg
@@ -183,7 +149,6 @@ optional_packages_menu() {
         docker --version
         docker-compose --version
         
-        echo ""
         read -p "Press Enter to continue..."
         ;;
         
@@ -203,7 +168,6 @@ optional_packages_menu() {
         success "Nginx installed successfully!"
         nginx -v
         
-        echo ""
         read -p "Press Enter to continue..."
         ;;
         
@@ -223,7 +187,6 @@ optional_packages_menu() {
         success "Redis installed successfully!"
         redis-server --version
         
-        echo ""
         read -p "Press Enter to continue..."
         ;;
         
@@ -239,7 +202,6 @@ optional_packages_menu() {
         success "UFW installed successfully!"
         ufw --version
         
-        echo ""
         read -p "Press Enter to continue..."
         ;;
         
@@ -255,7 +217,6 @@ optional_packages_menu() {
         success "Nano installed successfully!"
         nano --version
         
-        echo ""
         read -p "Press Enter to continue..."
         ;;
         
@@ -271,7 +232,6 @@ optional_packages_menu() {
         success "Screen installed successfully!"
         screen --version
         
-        echo ""
         read -p "Press Enter to continue..."
         ;;
         
@@ -287,7 +247,6 @@ optional_packages_menu() {
         success "Htop installed successfully!"
         htop --version
         
-        echo ""
         read -p "Press Enter to continue..."
         ;;
         
@@ -302,7 +261,6 @@ optional_packages_menu() {
         
         success "System updated successfully!"
         
-        echo ""
         read -p "Press Enter to continue..."
         ;;
         
@@ -319,7 +277,6 @@ optional_packages_menu() {
         python3 --version
         pip3 --version
         
-        echo ""
         read -p "Press Enter to continue..."
         ;;
         
@@ -335,10 +292,7 @@ optional_packages_menu() {
   done
 }
 
-# ==========================================
-#  MAIN SCRIPT START
-# ==========================================
-
+# MAIN SCRIPT
 header
 system_info
 main_menu
@@ -392,7 +346,7 @@ case $option in
     echo -e "${GREEN}║           PANEL INSTALLED SUCCESSFULLY!             ║${NC}"
     echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
     echo ""
-    echo -e "${YELLOW}█████████████████ START PANEL WITH THESE COMMANDS: █████████████████${NC}"
+    echo -e "${YELLOW}▓▓▓ START PANEL WITH THESE COMMANDS: ▓▓▓${NC}"
     echo ""
     echo -e "${CYAN}  cd crispy-adventure${NC}"
     echo -e "${CYAN}  node .${NC}"
@@ -433,7 +387,6 @@ case $option in
     
     log "Installing Cloudflared using binary method..."
     
-    # Check architecture
     ARCH=$(uname -m)
     if [ "$ARCH" = "x86_64" ]; then
       CLOUDFLARED_ARCH="amd64"
@@ -446,14 +399,11 @@ case $option in
       exit 1
     fi
     
-    # Download cloudflared
     log "Downloading cloudflared for ${CLOUDFLARED_ARCH}..."
     curl -sSL "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-${CLOUDFLARED_ARCH}" -o /usr/local/bin/cloudflared
     
-    # Make executable
     chmod +x /usr/local/bin/cloudflared
     
-    # Verify installation
     if command -v cloudflared &> /dev/null; then
       success "Cloudflared installed successfully!"
       echo ""
@@ -464,7 +414,7 @@ case $option in
     fi
     
     echo ""
-    echo -e "${CYAN}USAGE:${NC}"
+    echo -e "${CYAN}Usage:${NC}"
     echo -e "  cloudflared tunnel --url localhost:3000"
     echo ""
     ;;
@@ -475,7 +425,7 @@ case $option in
     
   5)
     echo ""
-    echo -e "${MAGENTA}█████████████████ SYSTEM HEALTH CHECK ███████████████████${NC}"
+    echo -e "${MAGENTA}▓▓▓ SYSTEM HEALTH CHECK ▓▓▓${NC}"
     echo ""
     echo -e "${CYAN}Memory Usage:${NC}"
     free -h | awk '/Mem:/ {printf "  Used: %s / Total: %s (%.0f%%)\n", $3, $2, ($3/$2)*100}'
@@ -483,3 +433,5 @@ case $option in
     echo -e "${CYAN}Disk Usage:${NC}"
     df -h / | awk 'NR==2 {printf "  Used: %s / Total: %s (%s)\n", $3, $2, $5}'
     echo ""
+    echo -e "${CYAN}CPU Load:${NC}"
+    uptime |

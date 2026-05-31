@@ -436,7 +436,7 @@ case $option in
       10)
         echo ""
         log "Going back..."
-        exit 0
+        main
         ;;
         
       *)
@@ -456,17 +456,4 @@ case $option in
     df -h / | awk 'NR==2 {printf "  Used: %s / Total: %s (%s)\n", $3, $2, $5}'
     echo ""
     echo -e "${CYAN}CPU Load:${NC}"
-    uptime | awk -F'load average:' '{print "  " $2}'
-    echo ""
-    ;;
-    
-  6)
-    warning "This will clean temporary files..."
-    read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
-      log "Cleaning apt cache..."
-      apt clean all
-      log "Removing old logs..."
-      find /var/log -type f -name "*.log" -delete 2>/dev/null
-      rm -rf /tmp/* 2>/dev/null
-      success "
+    uptime | awk -F'load average:' '{print "

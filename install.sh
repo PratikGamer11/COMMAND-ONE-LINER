@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-#   JAPNEET NETWORK SMART INSTALLER V50
+#     JAPNEET NETWORK INSTALLER GOD MODE
 # ==========================================
 
 RED='\033[1;31m'
@@ -18,18 +18,14 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# DETECT CONTAINER
-IS_CONTAINER=false
-grep -qa docker /proc/1/cgroup 2>/dev/null && IS_CONTAINER=true
-[ -f /.dockerenv ] && IS_CONTAINER=true
-
 # HELPERS
-warn(){ echo -e "${YELLOW}[!] $1${NC}"; }
 ok(){ echo -e "${GREEN}[✓] $1${NC}"; }
 err(){ echo -e "${RED}[✗] $1${NC}"; }
+warn(){ echo -e "${YELLOW}[!] $1${NC}"; }
 
-# HEADER
+# CLEAR SCREEN
 clear
+
 echo -e "${MAGENTA}"
 cat << 'EOF'
 ██╗ █████╗ ██████╗  ██████╗ ███████╗████████╗
@@ -39,24 +35,23 @@ cat << 'EOF'
 ██║██║  ██║██║     ╚██████╔╝███████╗   ██║
 ╚═╝╚═╝  ╚═╝╚═╝      ╚═════╝ ╚══════╝   ╚═╝
 EOF
+echo -e "${WHITE}      JAPNEET NETWORK GOD INSTALLER${NC}"
+echo -e "${MAGENTA}=====================================${NC}"
 
-echo -e "${WHITE}   JAPNEET NETWORK SMART INSTALLER${NC}"
-echo -e "${MAGENTA}====================================${NC}"
-
-# SERVICE SAFE START
+# SAFE SERVICE START (NO systemd crash)
 start_service() {
-  service $1 start 2>/dev/null || systemctl start $1 2>/dev/null
+  service "$1" start 2>/dev/null || systemctl start "$1" 2>/dev/null
 }
 
 # =========================
 # PANEL INSTALL (FIXED)
 # =========================
 install_panel() {
-  warn "Installing JAPNEET PANEL..."
+  warn "Installing PANEL + NODEJS..."
 
   apt update -y
 
-  # NodeJS LTS
+  # Node.js LTS FIXED
   curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
   apt install -y nodejs git curl wget
 
@@ -80,41 +75,29 @@ install_panel() {
   echo "cd crispy-adventure && node ."
   echo ""
 
-  read -p "Enter..."
+  read -p "Press Enter..."
 }
 
 # =========================
-# DOCKER INSTALL (SAFE MODE)
+# DOCKER (100% SAFE MODE)
 # =========================
 install_docker() {
-  warn "Installing Docker (SAFE MODE)"
+  warn "Installing Docker (SAFE MODE)..."
 
   apt update -y
   apt install -y docker.io
 
   start_service docker
 
-  ok "Docker installed"
+  ok "Docker installed safely"
   docker --version
 
-  read -p "Enter..."
+  read -p "Press Enter..."
 }
 
 # =========================
-# MENU
+# OPTIONAL MENU
 # =========================
-menu() {
-  echo ""
-  echo -e "${CYAN}[1] Install Panel"
-  echo -e "[2] Install Java 21"
-  echo -e "[3] Install Cloudflared"
-  echo -e "[4] Optional Packages"
-  echo -e "[5] System Check"
-  echo -e "[6] Cleanup"
-  echo -e "[7] Exit${NC}"
-  echo ""
-}
-
 optional_menu() {
   while true; do
     clear
@@ -127,7 +110,7 @@ optional_menu() {
     echo "[5] Nano"
     echo "[6] Screen"
     echo "[7] Htop"
-    echo "[8] Update"
+    echo "[8] Update System"
     echo "[9] Python3"
     echo "[10] Back"
     echo ""
@@ -135,70 +118,38 @@ optional_menu() {
     read -p "Select => " p
 
     case $p in
-
       1) install_docker ;;
-
-      2)
-        apt install -y nginx
-        start_service nginx
-        ok "Nginx installed"
-        read -p "Enter..."
-        ;;
-
-      3)
-        apt install -y redis-server
-        start_service redis-server
-        ok "Redis installed"
-        read -p "Enter..."
-        ;;
-
-      4)
-        apt install -y ufw
-        ok "UFW installed"
-        read -p "Enter..."
-        ;;
-
-      5)
-        apt install -y nano
-        ok "Nano installed"
-        read -p "Enter..."
-        ;;
-
-      6)
-        apt install -y screen
-        ok "Screen installed"
-        read -p "Enter..."
-        ;;
-
-      7)
-        apt install -y htop
-        ok "Htop installed"
-        read -p "Enter..."
-        ;;
-
-      8)
-        apt update -y && apt upgrade -y
-        ok "System updated"
-        read -p "Enter..."
-        ;;
-
-      9)
-        apt install -y python3 python3-pip
-        ok "Python installed"
-        read -p "Enter..."
-        ;;
-
-      10)
-        break
-        ;;
+      2) apt install -y nginx && start_service nginx && ok "Nginx installed" ;;
+      3) apt install -y redis-server && start_service redis-server && ok "Redis installed" ;;
+      4) apt install -y ufw && ok "UFW installed" ;;
+      5) apt install -y nano && ok "Nano installed" ;;
+      6) apt install -y screen && ok "Screen installed" ;;
+      7) apt install -y htop && ok "Htop installed" ;;
+      8) apt update -y && apt upgrade -y && ok "System updated" ;;
+      9) apt install -y python3 python3-pip && ok "Python installed" ;;
+      10) break ;;
     esac
   done
 }
 
 # =========================
-# MAIN START
+# MENU
 # =========================
+menu() {
+  echo ""
+  echo -e "${CYAN}[1] Install Panel"
+  echo "[2] Install Java 21"
+  echo "[3] Install Cloudflared"
+  echo "[4] Optional Packages"
+  echo "[5] System Check"
+  echo "[6] Cleanup"
+  echo "[7] Exit${NC}"
+  echo ""
+}
 
+# =========================
+# MAIN
+# =========================
 menu
 read -p "Select => " opt
 
@@ -213,7 +164,7 @@ case $opt in
     apt install -y wget tar
 
     cd /opt || exit
-    wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz
+    wget -q https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz
 
     tar -xvf jdk-21_linux-x64_bin.tar.gz
     mv jdk-21* java21
@@ -223,8 +174,8 @@ case $opt in
     source ~/.bashrc
 
     java -version
-    ok "Java installed"
-    read -p "Enter..."
+    ok "Java Installed"
+    read -p "Press Enter..."
     ;;
 
   3)
@@ -236,7 +187,7 @@ case $opt in
       x86_64) CF="amd64" ;;
       aarch64) CF="arm64" ;;
       armv7l) CF="arm" ;;
-      *) err "Unsupported arch"; exit 1 ;;
+      *) err "Unsupported architecture"; exit 1 ;;
     esac
 
     curl -fsSL "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-$CF" -o /usr/local/bin/cloudflared
@@ -244,7 +195,7 @@ case $opt in
 
     ok "Cloudflared installed"
     cloudflared --version
-    read -p "Enter..."
+    read -p "Press Enter..."
     ;;
 
   4) optional_menu ;;

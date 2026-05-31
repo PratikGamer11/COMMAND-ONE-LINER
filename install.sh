@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# GT INSTALLER - FINAL VERSION
+# GT INSTALLER - FULL FIXED VERSION
 # ==========================================
 
 # Colors
@@ -147,9 +147,18 @@ case $option in
     
     success "Panel installed successfully!"
     echo ""
-    echo -e "${GREEN}════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}  Panel is ready! Run: cd crispy-adventure && node .${NC}"
-    echo -e "${GREEN}════════════════════════════════════════╝${NC}"
+    echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║           PANEL INSTALLED SUCCESSFULLY!             ║${NC}"
+    echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "${YELLOW}▓▓▓ START PANEL WITH THESE COMMANDS: ▓▓▓${NC}"
+    echo ""
+    echo -e "${CYAN}  cd crispy-adventure${NC}"
+    echo -e "${CYAN}  node .${NC}"
+    echo ""
+    echo -e "${MAGENTA}  OR IN ONE LINE:${NC}"
+    echo -e "${WHITE}  cd crispy-adventure && node .${NC}"
+    echo ""
     ;;
     
   2)
@@ -192,103 +201,244 @@ case $option in
     spinner $!
     success "Cloudflared installed!"
     echo ""
-    cloudflared --version
+    echo -e "${CYAN}Commands:${NC}"
+    echo -e "  cloudflared tunnel --url localhost:3000"
     echo ""
     ;;
     
   4)
     clear
-    echo -e "${MAGENTA}═══════════════════════════════${NC}"
-    echo -e "${WHITE}      OPTIONAL PACKAGES${NC}"
-    echo -e "${MAGENTA}═══════════════════════════════${NC}"
+    echo -e "${MAGENTA}═══════════════════════════════════════════════${NC}"
+    echo -e "${WHITE}          OPTIONAL PACKAGES                 ${NC}"
+    echo -e "${MAGENTA}═══════════════════════════════════════════════${NC}"
     echo ""
-    echo "[1] Docker & Docker Compose"
-    echo "[2] Nginx Web Server"
-    echo "[3] Redis Database"
-    echo "[4] UFW Firewall"
-    echo "[5] Nano Editor"
-    echo "[6] Screen Manager"
-    echo "[7] Htop Monitor"
-    echo "[8] Update System"
-    echo "[9] Python 3 & Pip"
-    echo "[10] Go Back"
+    echo -e "  ${CYAN}[1]${NC} ${WHITE}Docker & Docker Compose${NC}"
+    echo -e "  ${CYAN}[2]${NC} ${WHITE}Nginx Web Server${NC}"
+    echo -e "  ${CYAN}[3]${NC} ${WHITE}Redis Database${NC}"
+    echo -e "  ${CYAN}[4]${NC} ${WHITE}UFW Firewall${NC}"
+    echo -e "  ${CYAN}[5]${NC} ${WHITE}Nano Editor${NC}"
+    echo -e "  ${CYAN}[6]${NC} ${WHITE}Screen Manager${NC}"
+    echo -e "  ${CYAN}[7]${NC} ${WHITE}Htop Monitor${NC}"
+    echo -e "  ${CYAN}[8]${NC} ${WHITE}Update System${NC}"
+    echo -e "  ${CYAN}[9]${NC} ${WHITE}Python 3 & Pip${NC}"
+    echo -e "  ${CYAN}[10]${NC} ${WHITE}Go Back${NC}"
     echo ""
     
-    read -p "Select Package: " pkg
+    read -p "  ${CYAN}Select =>${NC} " pkg
     
     case $pkg in
       1)
-        warning "Installing Docker..."
+        echo ""
+        warning "Installing Docker & Docker Compose..."
         read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
         if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
           error "Cancelled!"
           exit 1
         fi
+        
+        log "Updating packages..."
         apt update
+        
+        log "Installing dependencies..."
         apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
-        (curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg &) &
-        spinner $!
+        
+        log "Adding Docker GPG key..."
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+        
+        log "Adding Docker repository..."
         echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list
+        
+        log "Updating packages..."
         apt update
-        (apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin &) &
-        spinner $!
+        
+        log "Installing Docker..."
+        apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+        
+        log "Starting Docker..."
         systemctl start docker
         systemctl enable docker
-        success "Docker installed!"
+        
+        success "Docker installed successfully!"
+        echo ""
         docker --version
+        docker-compose --version
         ;;
+        
       2)
+        echo ""
+        warning "Installing Nginx..."
+        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+          error "Cancelled!"
+          exit 1
+        fi
+        
+        log "Updating packages..."
+        apt update
+        
         log "Installing Nginx..."
-        (apt install -y nginx &) &
-        spinner $!
-        success "Nginx installed!"
+        apt install -y nginx
+        
+        log "Starting Nginx..."
+        systemctl start nginx
+        systemctl enable nginx
+        
+        success "Nginx installed successfully!"
+        echo ""
+        nginx -v
         ;;
+        
       3)
+        echo ""
+        warning "Installing Redis..."
+        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+          error "Cancelled!"
+          exit 1
+        fi
+        
+        log "Updating packages..."
+        apt update
+        
         log "Installing Redis..."
-        (apt install -y redis-server &) &
-        spinner $!
-        success "Redis installed!"
+        apt install -y redis-server
+        
+        log "Starting Redis..."
+        systemctl start redis-server
+        systemctl enable redis-server
+        
+        success "Redis installed successfully!"
+        echo ""
+        redis-server --version
         ;;
+        
       4)
+        echo ""
+        warning "Installing UFW Firewall..."
+        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+          error "Cancelled!"
+          exit 1
+        fi
+        
+        log "Updating packages..."
+        apt update
+        
         log "Installing UFW..."
-        (apt install -y ufw &) &
-        spinner $!
-        success "UFW installed!"
+        apt install -y ufw
+        
+        success "UFW installed successfully!"
+        echo ""
+        ufw --version
         ;;
+        
       5)
+        echo ""
+        warning "Installing Nano..."
+        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+          error "Cancelled!"
+          exit 1
+        fi
+        
+        log "Updating packages..."
+        apt update
+        
         log "Installing Nano..."
-        (apt install -y nano &) &
-        spinner $!
-        success "Nano installed!"
+        apt install -y nano
+        
+        success "Nano installed successfully!"
+        echo ""
+        nano --version
         ;;
+        
       6)
+        echo ""
+        warning "Installing Screen..."
+        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+          error "Cancelled!"
+          exit 1
+        fi
+        
+        log "Updating packages..."
+        apt update
+        
         log "Installing Screen..."
-        (apt install -y screen &) &
-        spinner $!
-        success "Screen installed!"
+        apt install -y screen
+        
+        success "Screen installed successfully!"
+        echo ""
+        screen --version
         ;;
+        
       7)
+        echo ""
+        warning "Installing Htop..."
+        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+          error "Cancelled!"
+          exit 1
+        fi
+        
+        log "Updating packages..."
+        apt update
+        
         log "Installing Htop..."
-        (apt install -y htop &) &
-        spinner $!
-        success "Htop installed!"
+        apt install -y htop
+        
+        success "Htop installed successfully!"
+        echo ""
+        htop --version
         ;;
+        
       8)
-        log "Updating system..."
-        (apt update -y && apt upgrade -y &) &
+        echo ""
+        warning "Updating System..."
+        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+          error "Cancelled!"
+          exit 1
+        fi
+        
+        log "Updating package lists..."
+        (apt update -y &) &
         spinner $!
-        success "System updated!"
+        
+        log "Upgrading packages..."
+        (apt upgrade -y &) &
+        spinner $!
+        
+        success "System updated successfully!"
         ;;
+        
       9)
-        log "Installing Python 3..."
-        (apt install -y python3 python3-pip &) &
-        spinner $!
-        success "Python 3 installed!"
+        echo ""
+        warning "Installing Python 3 & Pip..."
+        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+          error "Cancelled!"
+          exit 1
+        fi
+        
+        log "Updating packages..."
+        apt update
+        
+        log "Installing Python 3 & Pip..."
+        apt install -y python3 python3-pip
+        
+        success "Python 3 installed successfully!"
+        echo ""
         python3 --version
+        pip3 --version
         ;;
+        
       10)
+        echo ""
+        log "Going back..."
         exit 0
         ;;
+        
       *)
         error "Invalid option!"
         ;;
@@ -308,9 +458,6 @@ case $option in
     echo -e "${CYAN}CPU Load:${NC}"
     uptime | awk -F'load average:' '{print "  " $2}'
     echo ""
-    echo -e "${CYAN}Running Services:${NC}"
-    systemctl list-units --type=service --state=running | grep -E "nginx|docker|redis" || echo "  No game services running"
-    echo ""
     ;;
     
   6)
@@ -322,19 +469,4 @@ case $option in
       log "Removing old logs..."
       find /var/log -type f -name "*.log" -delete 2>/dev/null
       rm -rf /tmp/* 2>/dev/null
-      success "System cleaned!"
-    else
-      error "Cancelled!"
-    fi
-    ;;
-    
-  7)
-    echo ""
-    echo -e "${GREEN}Goodbye! Thanks for using GT INSTALLER${NC}"
-    exit 0
-    ;;
-    
-  *)
-    error "Invalid option!"
-    ;;
-esac
+      success "

@@ -435,3 +435,4 @@ case $option in
     echo ""
     echo -e "${CYAN}CPU Load:${NC}"
     uptime |
+ ;;

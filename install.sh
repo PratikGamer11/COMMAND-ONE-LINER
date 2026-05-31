@@ -20,7 +20,7 @@ cat << 'EOF'
 EOF
 
 echo -e "${CYAN}═══════════════════════════════════════════${NC}"
-echo -e "               DARK PLAYZ INSTALLER"
+echo -e "${WHITE}               DARK PLAYZ INSTALLER${NC}"
 echo -e "${CYAN}═══════════════════════════════════════════${NC}"
 
 echo ""
@@ -33,13 +33,14 @@ echo ""
 
 echo -e "${YELLOW}[1] Install Panel${NC}"
 echo -e "${YELLOW}[2] Install Java 21${NC}"
-echo -e "${YELLOW}[3] Basic Installer${NC}"
+echo -e "${YELLOW}[3] Install Cloudflared${NC}"
 echo -e "${YELLOW}[4] Exit${NC}"
 echo ""
 
 read -p "Select => " option
 
 case $option in
+
   1)
     echo ""
     echo -e "${CYAN}[+] Updating System...${NC}"
@@ -51,50 +52,46 @@ case $option in
     echo -e "${CYAN}[+] Downloading Panel...${NC}"
     git clone https://github.com/pratikgamer11/crispy-adventure
 
-    cd crispy-adventure
+    cd crispy-adventure || exit
 
     echo -e "${CYAN}[+] Installing NPM Packages...${NC}"
     npm install express
 
     echo -e "${GREEN}[✓] Installation Completed!${NC}"
     echo -e "${GREEN}[✓] Starting Panel...${NC}"
+
     node .
     ;;
 
   2)
     echo ""
     echo -e "${CYAN}[+] Installing Java 21...${NC}"
+
     wget -q https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb
+
     dpkg -i jdk-21_linux-x64_bin.deb
+
     echo -e "${GREEN}[✓] Java 21 Installed!${NC}"
     java -version
     ;;
 
   3)
     echo ""
-    echo -e "${CYAN}[+] Basic Installer Started...${NC}"
-    
-    echo -e "${CYAN}[+] Updating...${NC}"
+    echo -e "${CYAN}[+] Installing Cloudflared...${NC}"
+
+    mkdir -p --mode=0755 /usr/share/keyrings
+
+    curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | \
+    gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg
+
+    echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' | \
+    tee /etc/apt/sources.list.d/cloudflared.list
+
     apt update -y
-    
-    echo -e "${CYAN}[+] Upgrading...${NC}"
-    apt upgrade -y
-    
-    echo -e "${CYAN}[+] Installing Node.js...${NC}"
-    apt install nodejs npm -y
-    
-    echo -e "${CYAN}[+] Installing Tools...${NC}"
-    apt install git curl wget unzip build-essential libssl-dev -y
-    
-    echo -e "${CYAN}[+] Installing Python...${NC}"
-    apt install python3 python3-pip -y
-    
-    echo -e "${CYAN}[+] Installing Utils...${NC}"
-    apt install screen htop -y
-    
-    echo -e "${GREEN}[✓] Basic Installation Complete!${NC}"
-    echo -e "Node: $(node -v)"
-    echo -e "NPM: $(npm -v)"
+    apt install -y cloudflared
+
+    echo -e "${GREEN}[✓] Cloudflared Installed Successfully!${NC}"
+    cloudflared --version
     ;;
 
   4)

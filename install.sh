@@ -371,4 +371,4 @@ case $option in
   *)
     error "Invalid option!"
     ;;
-esac          
+esac

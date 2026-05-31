@@ -76,7 +76,12 @@ case $option in
     ;;
 
   3)
+    3)
     echo ""
+    echo -e "${CYAN}[+] Fixing Package Manager...${NC}"
+    dpkg --configure -a
+    apt install -f -y
+
     echo -e "${CYAN}[+] Installing Cloudflared...${NC}"
 
     mkdir -p --mode=0755 /usr/share/keyrings
@@ -90,8 +95,12 @@ case $option in
     apt update -y
     apt install -y cloudflared
 
-    echo -e "${GREEN}[✓] Cloudflared Installed Successfully!${NC}"
-    cloudflared --version
+    if command -v cloudflared >/dev/null 2>&1; then
+        echo -e "${GREEN}[✓] Cloudflared Installed Successfully!${NC}"
+        cloudflared --version
+    else
+        echo -e "${RED}[✗] Cloudflared installation failed.${NC}"
+    fi
     ;;
 
   4)

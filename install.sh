@@ -47,7 +47,7 @@ read -p "Select ➜ " option
 
 case $option in
 
-1. echo ""
+1. echo 
    echo -e "${CYAN}[+] Updating System...${NC}"
    apt update -y
 

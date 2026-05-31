@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Colors
 RED='\033[1;31m'
 GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
@@ -9,6 +10,7 @@ NC='\033[0m'
 
 clear
 
+# Logo
 echo -e "${RED}"
 cat << "EOF"
 ██████╗  █████╗ ██████╗ ██╗  ██╗
@@ -33,7 +35,8 @@ echo ""
 
 echo -e "${YELLOW}[1] Install Panel${NC}"
 echo -e "${YELLOW}[2] Install Java 21${NC}"
-echo -e "${YELLOW}[3] Exit${NC}"
+echo -e "${YELLOW}[3] Basic Installer${NC}"
+echo -e "${YELLOW}[4] Exit${NC}"
 echo ""
 
 read -p "Select ➜ " option
@@ -61,6 +64,24 @@ case $option in
     java -version
     ;;
   3)
+    echo -e "${CYAN}[+] Starting Basic Installer...${NC}"
+    echo -e "${CYAN}[+] Updating Package Lists...${NC}"
+    apt update -y
+    echo -e "${CYAN}[+] Upgrading Packages...${NC}"
+    apt upgrade -y
+    echo -e "${CYAN}[+] Installing Node.js & NPM...${NC}"
+    apt install nodejs npm -y
+    echo -e "${CYAN}[+] Installing Essential Dependencies...${NC}"
+    apt install git curl wget unzip build-essential libssl-dev -y
+    echo -e "${CYAN}[+] Installing Python & Python Pip...${NC}"
+    apt install python3 python3-pip -y
+    echo -e "${CYAN}[+] Installing Screen & Htop...${NC}"
+    apt install screen htop -y
+    echo -e "${GREEN}[✓] Basic Installer Completed!${NC}"
+    echo -e "${GREEN}[✓] Node Version: $(node -v)${NC}"
+    echo -e "${GREEN}[✓] NPM Version: $(npm -v)${NC}"
+    ;;
+  4)
     echo -e "${GREEN}Goodbye!${NC}"
     exit
     ;;

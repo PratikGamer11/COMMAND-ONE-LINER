@@ -20,7 +20,7 @@ cat << 'EOF'
 EOF
 
 echo -e "${CYAN}═══════════════════════════════════════════${NC}"
-echo -e "${WHITE}               DARK PLAYZ INSTALLER${NC}"
+echo -e "${WHITE}         DARK PLAYZ INSTALLER${NC}"
 echo -e "${CYAN}═══════════════════════════════════════════${NC}"
 
 echo ""
@@ -34,7 +34,8 @@ echo ""
 echo -e "${YELLOW}[1] Install Panel${NC}"
 echo -e "${YELLOW}[2] Install Java 21${NC}"
 echo -e "${YELLOW}[3] Install Cloudflared${NC}"
-echo -e "${YELLOW}[4] Exit${NC}"
+echo -e "${YELLOW}[4] Optional Packages${NC}"
+echo -e "${YELLOW}[5] Exit${NC}"
 echo ""
 
 read -p "Select => " option
@@ -42,47 +43,32 @@ read -p "Select => " option
 case $option in
 
   1)
-    echo ""
-    echo -e "${CYAN}[+] Updating System...${NC}"
     apt update -y
+    apt install -y git nodejs npm curl wget
 
-    echo -e "${CYAN}[+] Installing Dependencies...${NC}"
-    apt install git nodejs npm curl wget -y
-
-    echo -e "${CYAN}[+] Downloading Panel...${NC}"
     git clone https://github.com/pratikgamer11/crispy-adventure
-
     cd crispy-adventure || exit
 
-    echo -e "${CYAN}[+] Installing NPM Packages...${NC}"
     npm install express
 
-    echo -e "${GREEN}[✓] Installation Completed!${NC}"
     echo -e "${GREEN}[✓] Starting Panel...${NC}"
-
     node .
     ;;
 
   2)
-    echo ""
     echo -e "${CYAN}[+] Installing Java 21...${NC}"
 
     wget -q https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb
-
     dpkg -i jdk-21_linux-x64_bin.deb
 
-    echo -e "${GREEN}[✓] Java 21 Installed!${NC}"
     java -version
     ;;
 
   3)
-  
-    echo ""
-    echo -e "${CYAN}[+] Fixing Package Manager...${NC}"
+    echo -e "${CYAN}[+] Fixing Packages...${NC}"
+
     dpkg --configure -a
     apt install -f -y
-
-    echo -e "${CYAN}[+] Installing Cloudflared...${NC}"
 
     mkdir -p --mode=0755 /usr/share/keyrings
 
@@ -95,44 +81,59 @@ case $option in
     apt update -y
     apt install -y cloudflared
 
-    if command -v cloudflared >/dev/null 2>&1; then
-        echo -e "${GREEN}[✓] Cloudflared Installed Successfully!${NC}"
-        cloudflared --version
-    else
-        echo -e "${RED}[✗] Cloudflared installation failed.${NC}"
-    fi
+    cloudflared --version
     ;;
-  4)4. clear
-   echo -e "${CYAN}════════════════════════════════════${NC}"
-   echo -e "${WHITE}       OPTIONAL PACKAGES${NC}"
-   echo -e "${CYAN}════════════════════════════════════${NC}"
 
-   echo ""
-   echo "[1] Docker"
-   echo "[2] Nginx"
-   echo "[3] Redis"
-   echo "[4] UFW Firewall"
-   echo "[5] Nano"
-   echo "[6] Screen"
-   echo "[7] Htop"
-   echo "[8] Update System"
-   echo ""
+  4)
+    clear
 
-   read -p "Select Package => " pkg
+    echo -e "${CYAN}══════════════════════════════${NC}"
+    echo -e "${WHITE}      OPTIONAL PACKAGES${NC}"
+    echo -e "${CYAN}══════════════════════════════${NC}"
 
-   case $pkg in
+    echo ""
+    echo "[1] Docker"
+    echo "[2] Nginx"
+    echo "[3] Redis"
+    echo "[4] UFW Firewall"
+    echo "[5] Nano"
+    echo "[6] Screen"
+    echo "[7] Htop"
+    echo "[8] Update System"
+    echo ""
 
-   1. curl -fsSL https://get.docker.com | sh ;;
-   2. apt install -y nginx ;;
-   3. apt install -y redis-server ;;
-   4. apt install -y ufw ;;
-   5. apt install -y nano ;;
-   6. apt install -y screen ;;
-   7. apt install -y htop ;;
-   8. apt update -y && apt upgrade -y ;;
-      *) echo "Invalid Option!" ;;
-      esac
-      ;;
+    read -p "Select Package => " pkg
+
+    case $pkg in
+      1)
+        curl -fsSL https://get.docker.com | sh
+        ;;
+      2)
+        apt install -y nginx
+        ;;
+      3)
+        apt install -y redis-server
+        ;;
+      4)
+        apt install -y ufw
+        ;;
+      5)
+        apt install -y nano
+        ;;
+      6)
+        apt install -y screen
+        ;;
+      7)
+        apt install -y htop
+        ;;
+      8)
+        apt update -y && apt upgrade -y
+        ;;
+      *)
+        echo "Invalid Option!"
+        ;;
+    esac
+    ;;
 
   5)
     echo -e "${GREEN}Bye!${NC}"

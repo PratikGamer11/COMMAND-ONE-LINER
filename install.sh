@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # ==========================================
-# DARK PLAYZ - ENHANCED INSTALLER V2
+# GT INSTALLER - FINAL VERSION
 # ==========================================
 
-# Color Codes
+# Colors
 RED='\033[1;31m'
 GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
@@ -54,7 +54,7 @@ warning() {
 
 header() {
   clear
-  echo -e "${RED}"
+  echo -e "${MAGENTA}"
   cat << 'EOF'
   ██████╗ ███████╗████████╗██████╗  ██████╗ 
   ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔═══██╗
@@ -64,7 +64,7 @@ header() {
   ╚═════╝ ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ 
 EOF
   echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
-  echo -e "${WHITE}${BOLD}            DARK PLAYZ INSTALLER V2${NC}"
+  echo -e "${WHITE}${BOLD}              GT INSTALLER${NC}"
   echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
   echo ""
 }
@@ -80,7 +80,7 @@ system_info() {
   echo ""
 }
 
-menu() {
+main_menu() {
   echo -e "${MAGENTA}▓▓▓▓▓▓▓▓▓▓▓ MAIN MENU ▓▓▓▓▓▓▓▓▓▓▓${NC}"
   echo ""
   echo -e "  ${CYAN}[1]${NC} ${WHITE}Install Panel${NC}              - Setup game panel"
@@ -93,10 +93,10 @@ menu() {
   echo ""
 }
 
-# Main Script
+# MAIN SCRIPT
 header
 system_info
-menu
+main_menu
 
 read -p "  ${CYAN}Select =>${NC} " option
 
@@ -104,7 +104,7 @@ case $option in
   1)
     echo ""
     warning "This will install the Panel..."
-    read -p "Continue? [y/N]: " confirm
+    read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
     if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
       error "Cancelled!"
       exit 1
@@ -154,6 +154,13 @@ case $option in
     
   2)
     echo ""
+    warning "This will install Java 21..."
+    read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+      error "Cancelled!"
+      exit 1
+    fi
+    
     log "Installing Java 21 JDK..."
     (apt install -y openjdk-21-jdk &) &
     spinner $!
@@ -165,23 +172,24 @@ case $option in
     
   3)
     echo ""
-    log "Installing Cloudflared..."
+    warning "This will install Cloudflared..."
+    read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+      error "Cancelled!"
+      exit 1
+    fi
     
+    log "Installing Cloudflared..."
     dpkg --configure -a
     apt install -f -y
-    
     mkdir -p --mode=0755 /usr/share/keyrings
-    
     (curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg &) &
     spinner $!
-    
     echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' | tee /etc/apt/sources.list.d/cloudflared.list
-    
     (apt update -y &) &
     spinner $!
     (apt install -y cloudflared &) &
     spinner $!
-    
     success "Cloudflared installed!"
     echo ""
     cloudflared --version
@@ -210,22 +218,22 @@ case $option in
     
     case $pkg in
       1)
-        log "Installing Docker..."
+        warning "Installing Docker..."
+        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+          error "Cancelled!"
+          exit 1
+        fi
         apt update
         apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
-        
         (curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg &) &
         spinner $!
-        
         echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list
-        
         apt update
         (apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin &) &
         spinner $!
-        
         systemctl start docker
         systemctl enable docker
-        
         success "Docker installed!"
         docker --version
         ;;
@@ -242,7 +250,7 @@ case $option in
         success "Redis installed!"
         ;;
       4)
-        log "Installing UFW Firewall..."
+        log "Installing UFW..."
         (apt install -y ufw &) &
         spinner $!
         success "UFW installed!"
@@ -303,28 +311,26 @@ case $option in
     echo -e "${CYAN}Running Services:${NC}"
     systemctl list-units --type=service --state=running | grep -E "nginx|docker|redis" || echo "  No game services running"
     echo ""
-    echo -e "${CYAN}Network Connections:${NC}"
-    ss -tuln 2>/dev/null | grep LISTEN | head -5 || netstat -tuln 2>/dev/null | grep LISTEN | head -5
-    echo ""
     ;;
     
   6)
-    warning "This will clean temporary files and cache..."
-    read -p "Continue? [y/N]: " confirm
+    warning "This will clean temporary files..."
+    read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
       log "Cleaning apt cache..."
       apt clean all
       log "Removing old logs..."
       find /var/log -type f -name "*.log" -delete 2>/dev/null
-      log "Cleaning tmp..."
       rm -rf /tmp/* 2>/dev/null
       success "System cleaned!"
+    else
+      error "Cancelled!"
     fi
     ;;
     
   7)
     echo ""
-    echo -e "${GREEN}Goodbye! Thanks for using Dark Playz Installer${NC}"
+    echo -e "${GREEN}Goodbye! Thanks for using GT INSTALLER${NC}"
     exit 0
     ;;
     

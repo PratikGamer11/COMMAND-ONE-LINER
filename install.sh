@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-#   JAPNEET NETWORK SMART INSTALLER V1
+#   JAPNEET NETWORK SMART INSTALLER V50
 # ==========================================
 
 RED='\033[1;31m'
@@ -18,33 +18,17 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# =========================
-# DETECT ENVIRONMENT
-# =========================
-
+# DETECT CONTAINER
 IS_CONTAINER=false
+grep -qa docker /proc/1/cgroup 2>/dev/null && IS_CONTAINER=true
+[ -f /.dockerenv ] && IS_CONTAINER=true
 
-if grep -qa docker /proc/1/cgroup 2>/dev/null; then
-  IS_CONTAINER=true
-fi
-
-if [ -f /.dockerenv ]; then
-  IS_CONTAINER=true
-fi
-
-# =========================
 # HELPERS
-# =========================
-
-log(){ echo -e "${CYAN}[$(date '+%H:%M:%S')] $1${NC}"; }
+warn(){ echo -e "${YELLOW}[!] $1${NC}"; }
 ok(){ echo -e "${GREEN}[✓] $1${NC}"; }
 err(){ echo -e "${RED}[✗] $1${NC}"; }
-warn(){ echo -e "${YELLOW}[!] $1${NC}"; }
 
-# =========================
 # HEADER
-# =========================
-
 clear
 echo -e "${MAGENTA}"
 cat << 'EOF'
@@ -55,87 +39,86 @@ cat << 'EOF'
 ██║██║  ██║██║     ╚██████╔╝███████╗   ██║
 ╚═╝╚═╝  ╚═╝╚═╝      ╚═════╝ ╚══════╝   ╚═╝
 EOF
-echo -e "${WHITE}      JAPNEET NETWORK SMART INSTALLER${NC}"
-echo -e "${MAGENTA}======================================${NC}"
 
-# Show environment
-if $IS_CONTAINER; then
-  warn "Container environment detected (Pterodactyl / VPS limit mode)"
-else
-  ok "Full VPS detected"
-fi
+echo -e "${WHITE}   JAPNEET NETWORK SMART INSTALLER${NC}"
+echo -e "${MAGENTA}====================================${NC}"
 
-# =========================
-# SAFE SERVICE FUNCTION
-# =========================
-
+# SERVICE SAFE START
 start_service() {
   service $1 start 2>/dev/null || systemctl start $1 2>/dev/null
 }
 
 # =========================
-# SAFE DOCKER INSTALL
+# PANEL INSTALL (FIXED)
 # =========================
-
-install_docker() {
-  warn "Installing Docker (SMART MODE)..."
+install_panel() {
+  warn "Installing JAPNEET PANEL..."
 
   apt update -y
 
-  if $IS_CONTAINER; then
-    # SAFE MODE FOR CONTAINERS
-    apt install -y docker.io
-    start_service docker
-    ok "Docker installed via docker.io (container safe)"
-  else
-    # FULL VPS MODE
-    apt install -y ca-certificates curl gnupg
+  # NodeJS LTS
+  curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+  apt install -y nodejs git curl wget
 
-    install -m 0755 -d /etc/apt/keyrings
+  ok "Node: $(node -v)"
+  ok "NPM: $(npm -v)"
 
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
-      | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  rm -rf crispy-adventure
 
-    chmod a+r /etc/apt/keyrings/docker.gpg
+  git clone https://github.com/pratikgamer11/crispy-adventure || {
+    err "Git clone failed"
+    return
+  }
 
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-    $(. /etc/os-release && echo $VERSION_CODENAME) stable" \
-    > /etc/apt/sources.list.d/docker.list
+  cd crispy-adventure || exit
+  npm install
 
-    apt update -y
-    apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  ok "PANEL INSTALLED SUCCESSFULLY"
 
-    systemctl enable docker
-    systemctl start docker
-
-    ok "Docker CE installed (full mode)"
-  fi
-
-  docker --version
   echo ""
+  echo -e "${CYAN}START COMMAND:${NC}"
+  echo "cd crispy-adventure && node ."
+  echo ""
+
+  read -p "Enter..."
+}
+
+# =========================
+# DOCKER INSTALL (SAFE MODE)
+# =========================
+install_docker() {
+  warn "Installing Docker (SAFE MODE)"
+
+  apt update -y
+  apt install -y docker.io
+
+  start_service docker
+
+  ok "Docker installed"
+  docker --version
+
   read -p "Enter..."
 }
 
 # =========================
 # MENU
 # =========================
-
 menu() {
-  echo -e "${CYAN}"
-  echo "[1] Install Panel"
-  echo "[2] Install Java 21"
-  echo "[3] Install Cloudflared"
-  echo "[4] Optional Packages"
-  echo "[5] System Check"
-  echo "[6] Cleanup"
-  echo "[7] Exit"
-  echo -e "${NC}"
+  echo ""
+  echo -e "${CYAN}[1] Install Panel"
+  echo -e "[2] Install Java 21"
+  echo -e "[3] Install Cloudflared"
+  echo -e "[4] Optional Packages"
+  echo -e "[5] System Check"
+  echo -e "[6] Cleanup"
+  echo -e "[7] Exit${NC}"
+  echo ""
 }
 
 optional_menu() {
   while true; do
     clear
-    echo -e "${MAGENTA}OPTIONAL PACKAGES (SMART MODE)${NC}"
+    echo -e "${MAGENTA}OPTIONAL PACKAGES${NC}"
     echo ""
     echo "[1] Docker"
     echo "[2] Nginx"
@@ -156,7 +139,6 @@ optional_menu() {
       1) install_docker ;;
 
       2)
-        apt update -y
         apt install -y nginx
         start_service nginx
         ok "Nginx installed"
@@ -164,7 +146,6 @@ optional_menu() {
         ;;
 
       3)
-        apt update -y
         apt install -y redis-server
         start_service redis-server
         ok "Redis installed"
@@ -215,13 +196,56 @@ optional_menu() {
 }
 
 # =========================
-# MAIN
+# MAIN START
 # =========================
 
 menu
 read -p "Select => " opt
 
 case $opt in
+
+  1) install_panel ;;
+
+  2)
+    warn "Installing Java 21..."
+
+    apt update -y
+    apt install -y wget tar
+
+    cd /opt || exit
+    wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz
+
+    tar -xvf jdk-21_linux-x64_bin.tar.gz
+    mv jdk-21* java21
+
+    echo 'export JAVA_HOME=/opt/java21' >> ~/.bashrc
+    echo 'export PATH=$JAVA_HOME/bin:$PATH' >> ~/.bashrc
+    source ~/.bashrc
+
+    java -version
+    ok "Java installed"
+    read -p "Enter..."
+    ;;
+
+  3)
+    warn "Installing Cloudflared..."
+
+    ARCH=$(uname -m)
+
+    case $ARCH in
+      x86_64) CF="amd64" ;;
+      aarch64) CF="arm64" ;;
+      armv7l) CF="arm" ;;
+      *) err "Unsupported arch"; exit 1 ;;
+    esac
+
+    curl -fsSL "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-$CF" -o /usr/local/bin/cloudflared
+    chmod +x /usr/local/bin/cloudflared
+
+    ok "Cloudflared installed"
+    cloudflared --version
+    read -p "Enter..."
+    ;;
 
   4) optional_menu ;;
 

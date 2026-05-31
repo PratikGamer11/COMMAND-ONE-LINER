@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-#  JAPNEET NETWORK INSTALLER
-#  FULLY FIXED VERSION
+#  JAPNEET NETWORK INSTALLER (FIXED V2)
 # ==========================================
 
 # Colors
@@ -23,448 +22,254 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # FUNCTIONS
-spinner() {
-  local pid=$1
-  local delay=0.1
-  local spinstr='|/-\'
-  local i=0
-  while kill -0 $pid 2>/dev/null; do
-    local temp=${spinstr:$(($i % ${#spinstr})):1}
-    printf "\r[${temp}] Processing... "
-    sleep $delay
-    ((i++))
-  done
-  printf "\r[✓] DONE!                 \n"
-}
-
-log() {
-  echo -e "${CYAN}[$(date '+%H:%M:%S')]${NC} $1"
-}
-
-success() {
-  echo -e "${GREEN}[✓] $1${NC}"
-}
-
-error() {
-  echo -e "${RED}[✗] $1${NC}"
-}
-
-warning() {
-  echo -e "${YELLOW}[!] $1${NC}"
-}
+log() { echo -e "${CYAN}[$(date '+%H:%M:%S')]${NC} $1"; }
+success() { echo -e "${GREEN}[✓] $1${NC}"; }
+error() { echo -e "${RED}[✗] $1${NC}"; }
+warning() { echo -e "${YELLOW}[!] $1${NC}"; }
 
 # HEADER
 header() {
   clear
   echo -e "${MAGENTA}"
   cat << 'EOF'
-  ██████╗ ███████╗████████╗██████╗  ██████╗ 
-  ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔═══██╗
-  ██║  ██║█████╗     ██║   ██████╔╝██║   ██║
-  ██║  ██║██╔══╝     ██║   ██╔══██╗██║   ██║
-  ██████╔╝███████╗   ██║   ██║  ██║╚██████╔╝
-  ╚═════╝ ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ 
+  ██████╗ ███████╗████████╗██████╗
+  ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗
+  ██║  ██║█████╗     ██║   ██████╔╝
+  ██║  ██║██╔══╝     ██║   ██╔══██╗
+  ██████╔╝███████╗   ██║   ██║  ██║
+  ╚═════╝ ╚══════╝   ╚═╝   ╚═╝  ╚═╝
 EOF
-  echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
-  echo -e "${WHITE}${BOLD}              JAPNEET NETWORK                ${NC}"
-  echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
-  echo ""
+  echo -e "${CYAN}══════════════════════════════${NC}"
+  echo -e "${WHITE}${BOLD}   JAPNEET NETWORK INSTALLER  ${NC}"
+  echo -e "${CYAN}══════════════════════════════${NC}"
 }
 
 # SYSTEM INFO
 system_info() {
-  echo -e "${MAGENTA}▓▓▓▓▓▓▓▓▓▓▓ SYSTEM INFORMATION ▓▓▓▓▓▓▓▓▓▓▓${NC}"
-  echo ""
-  echo -e "  ${WHITE}OS:${NC}       $(grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '"')"
-  echo -e "  ${WHITE}Kernel:${NC}   $(uname -r)"
-  echo -e "  ${WHITE}RAM:${NC}      $(free -h | awk '/Mem:/ {print $2}')"
-  echo -e "  ${WHITE}CPU:${NC}      $(nproc) Cores @ $(grep 'model name' /proc/cpuinfo | head -1 | cut -d: -f2 | xargs)"
-  echo -e "  ${WHITE}User:${NC}     $(whoami)"
-  echo -e "  ${WHITE}Uptime:${NC}   $(uptime -p 2>/dev/null || uptime | awk '{print $3,$4}' | tr -d ',')"
+  echo -e "${MAGENTA}SYSTEM INFO${NC}"
+  echo -e "OS: $(grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '\"')"
+  echo -e "Kernel: $(uname -r)"
+  echo -e "RAM: $(free -h | awk '/Mem:/ {print $2}')"
+  echo -e "CPU: $(nproc) cores"
   echo ""
 }
 
-# MAIN MENU
-main_menu() {
-  echo -e "${MAGENTA}▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ MAIN MENU ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓${NC}"
-  echo ""
-  echo -e "  ${CYAN}[1]${NC} ${WHITE}INSTALL PANEL${NC}              - Setup game panel"
-  echo -e "  ${CYAN}[2]${NC} ${WHITE}INSTALL JAVA 21${NC}            - Java runtime"
-  echo -e "  ${CYAN}[3]${NC} ${WHITE}INSTALL CLOUDFLARED${NC}       - Tunnel service"
-  echo -e "  ${CYAN}[4]${NC} ${WHITE}OPTIONAL PACKAGES${NC}         - Additional tools"
-  echo -e "  ${CYAN}[5]${NC} ${WHITE}SYSTEM HEALTH CHECK${NC}        - Check system status"
-  echo -e "  ${CYAN}[6]${NC} ${WHITE}CLEANUP SYSTEM${NC}            - Free up space"
-  echo -e "  ${CYAN}[7]${NC} ${WHITE}EXIT${NC}                      - Goodbye!"
-  echo ""
+# MENU
+menu() {
+  echo -e "${MAGENTA}MAIN MENU${NC}"
+  echo -e "${CYAN}[1]${NC} Install Panel"
+  echo -e "${CYAN}[2]${NC} Install Java 21"
+  echo -e "${CYAN}[3]${NC} Install Cloudflared"
+  echo -e "${CYAN}[4]${NC} Optional Packages"
+  echo -e "${CYAN}[5]${NC} System Check"
+  echo -e "${CYAN}[6]${NC} Cleanup System"
+  echo -e "${CYAN}[7]${NC} Exit"
 }
 
-# OPTIONAL PACKAGES
-optional_packages_menu() {
+# OPTIONAL MENU
+optional_menu() {
   while true; do
     clear
-    echo -e "${MAGENTA}═══════════════════════════ OPTIONAL PACKAGES ═════════════════════${NC}"
-    echo ""
-    echo -e "  ${CYAN}[1]${NC} ${WHITE}DOCKER & DOCKER COMPOSE${NC}"
-    echo -e "  ${CYAN}[2]${NC} ${WHITE}NGINX WEB SERVER${NC}"
-    echo -e "  ${CYAN}[3]${NC} ${WHITE}REDIS DATABASE${NC}"
-    echo -e "  ${CYAN}[4]${NC} ${WHITE}UFW FIREWALL${NC}"
-    echo -e "  ${CYAN}[5]${NC} ${WHITE}NANO EDITOR${NC}"
-    echo -e "  ${CYAN}[6]${NC} ${WHITE}SCREEN MANAGER${NC}"
-    echo -e "  ${CYAN}[7]${NC} ${WHITE}HTOP MONITOR${NC}"
-    echo -e "  ${CYAN}[8]${NC} ${WHITE}UPDATE SYSTEM${NC}"
-    echo -e "  ${CYAN}[9]${NC} ${WHITE}PYTHON 3 & PIP${NC}"
-    echo -e "  ${CYAN}[10]${NC} ${WHITE}GO BACK${NC}"
-    echo ""
-    
-    read -p "  ${CYAN}Select =>${NC} " pkg
-    
-    case $pkg in
+    echo -e "${MAGENTA}OPTIONAL PACKAGES${NC}"
+    echo -e "[1] Docker"
+    echo -e "[2] Nginx"
+    echo -e "[3] Redis"
+    echo -e "[4] UFW"
+    echo -e "[5] Nano"
+    echo -e "[6] Screen"
+    echo -e "[7] Htop"
+    echo -e "[8] Update System"
+    echo -e "[9] Python3 + Pip"
+    echo -e "[10] Back"
+
+    read -p "Select => " p
+
+    case $p in
+
       1)
-        echo ""
-        warning "Installing Docker & Docker Compose..."
-        log "Updating packages..."
+        warning "Installing Docker..."
         apt update -y
-        
-        log "Installing dependencies..."
-        apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
-        
-        log "Adding Docker GPG key..."
-        mkdir -p /etc/apt/keyrings
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        
-        log "Adding Docker repository..."
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
-        
-        log "Updating packages..."
+        apt install -y ca-certificates curl gnupg
+
+        install -m 0755 -d /etc/apt/keyrings
+
+        curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        chmod a+r /etc/apt/keyrings/docker.gpg
+
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(. /etc/os-release && echo $VERSION_CODENAME) stable" > /etc/apt/sources.list.d/docker.list
+
         apt update -y
-        
-        log "Installing Docker..."
-        apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-        
-        log "Starting Docker..."
-        systemctl start docker
+        apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
         systemctl enable docker
-        
-        success "Docker installed successfully!"
-        docker --version
-        docker-compose --version
-        
-        read -p "Press Enter to continue..."
+        systemctl start docker
+
+        success "Docker installed"
+        read -p "Enter..."
         ;;
-        
+
       2)
-        echo ""
-        warning "Installing Nginx..."
-        log "Updating packages..."
-        apt update -y
-        
-        log "Installing Nginx..."
-        apt install -y nginx
-        
-        log "Starting Nginx..."
-        systemctl start nginx
-        systemctl enable nginx
-        
-        success "Nginx installed successfully!"
-        nginx -v
-        
-        read -p "Press Enter to continue..."
+        apt update -y && apt install -y nginx
+        systemctl enable nginx && systemctl start nginx
+        success "Nginx installed"
+        read -p "Enter..."
         ;;
-        
+
       3)
-        echo ""
-        warning "Installing Redis..."
-        log "Updating packages..."
-        apt update -y
-        
-        log "Installing Redis..."
-        apt install -y redis-server
-        
-        log "Starting Redis..."
-        systemctl start redis-server
-        systemctl enable redis-server
-        
-        success "Redis installed successfully!"
-        redis-server --version
-        
-        read -p "Press Enter to continue..."
+        apt update -y && apt install -y redis-server
+        systemctl enable redis-server && systemctl start redis-server
+        success "Redis installed"
+        read -p "Enter..."
         ;;
-        
+
       4)
-        echo ""
-        warning "Installing UFW Firewall..."
-        log "Updating packages..."
-        apt update -y
-        
-        log "Installing UFW..."
-        apt install -y ufw
-        
-        success "UFW installed successfully!"
-        ufw --version
-        
-        read -p "Press Enter to continue..."
+        apt update -y && apt install -y ufw
+        success "UFW installed"
+        read -p "Enter..."
         ;;
-        
+
       5)
-        echo ""
-        warning "Installing Nano..."
-        log "Updating packages..."
-        apt update -y
-        
-        log "Installing Nano..."
         apt install -y nano
-        
-        success "Nano installed successfully!"
-        nano --version
-        
-        read -p "Press Enter to continue..."
+        success "Nano installed"
+        read -p "Enter..."
         ;;
-        
+
       6)
-        echo ""
-        warning "Installing Screen..."
-        log "Updating packages..."
-        apt update -y
-        
-        log "Installing Screen..."
         apt install -y screen
-        
-        success "Screen installed successfully!"
-        screen --version
-        
-        read -p "Press Enter to continue..."
+        success "Screen installed"
+        read -p "Enter..."
         ;;
-        
+
       7)
-        echo ""
-        warning "Installing Htop..."
-        log "Updating packages..."
-        apt update -y
-        
-        log "Installing Htop..."
         apt install -y htop
-        
-        success "Htop installed successfully!"
-        htop --version
-        
-        read -p "Press Enter to continue..."
+        success "Htop installed"
+        read -p "Enter..."
         ;;
-        
+
       8)
-        echo ""
-        warning "Updating System..."
-        log "Updating package lists..."
-        apt update -y
-        
-        log "Upgrading packages..."
-        apt upgrade -y
-        
-        success "System updated successfully!"
-        
-        read -p "Press Enter to continue..."
+        apt update -y && apt upgrade -y
+        success "System updated"
+        read -p "Enter..."
         ;;
-        
+
       9)
-        echo ""
-        warning "Installing Python 3 & Pip..."
-        log "Updating packages..."
-        apt update -y
-        
-        log "Installing Python 3 & Pip..."
         apt install -y python3 python3-pip
-        
-        success "Python 3 installed successfully!"
-        python3 --version
-        pip3 --version
-        
-        read -p "Press Enter to continue..."
+        success "Python installed"
+        read -p "Enter..."
         ;;
-        
+
       10)
         break
-        ;;
-        
-      *)
-        error "Invalid option! Please select 1-10"
-        sleep 2
         ;;
     esac
   done
 }
 
-# ==========================================
 # MAIN SCRIPT
-# ==========================================
-
 header
 system_info
-main_menu
+menu
 
-read -p "  ${CYAN}Select =>${NC} " option
+read -p "Select => " opt
 
-case $option in
+case $opt in
+
   1)
-    echo ""
-    warning "This will install the Panel..."
-    read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-      error "Cancelled!"
-      exit 1
-    fi
-    
-    log "Updating package lists..."
+    warning "Installing Panel..."
     apt update -y
-    success "Packages updated"
-    
-    log "Installing dependencies: git, nodejs, npm, curl, wget..."
     apt install -y git nodejs npm curl wget
-    success "Dependencies installed"
-    
+
     if [ -d "crispy-adventure" ]; then
-      warning "Removing existing installation..."
       rm -rf crispy-adventure
     fi
-    
-    log "Cloning Panel repository..."
+
     git clone https://github.com/pratikgamer11/crispy-adventure
-    
+
     if [ ! -d "crispy-adventure" ]; then
-      error "Failed to clone repository!"
+      error "Clone failed"
       exit 1
     fi
-    
+
     cd crispy-adventure || exit
-    
-    if [ -f "package.json" ]; then
-      log "Installing Node modules..."
-      npm install
-    else
-      warning "No package.json found, installing express..."
-      npm install express
-    fi
-    
-    success "Panel installed successfully!"
-    echo ""
-    echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║           PANEL INSTALLED SUCCESSFULLY!             ║${NC}"
-    echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
-    echo ""
-    echo -e "${YELLOW}▓▓▓ START PANEL WITH THESE COMMANDS: ▓▓▓${NC}"
-    echo ""
-    echo -e "${CYAN}  cd crispy-adventure${NC}"
-    echo -e "${CYAN}  node .${NC}"
-    echo ""
-    echo -e "${MAGENTA}  OR IN ONE LINE:${NC}"
-    echo -e "${WHITE}  cd crispy-adventure && node .${NC}"
-    echo ""
+
+    npm install
+
+    success "Panel Installed"
+    echo "Run: cd crispy-adventure && node ."
     ;;
-    
+
   2)
-    echo ""
-    warning "This will install Java 21..."
-    read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-      error "Cancelled!"
-      exit 1
-    fi
-    
-    log "Updating packages..."
+    warning "Installing Java 21..."
+
     apt update -y
-    
-    log "Installing Java 21 JDK..."
-    apt install -y openjdk-21-jdk
-    success "Java 21 installed"
-    echo ""
+    apt install -y wget tar
+
+    cd /opt || exit
+    wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz
+
+    tar -xvf jdk-21_linux-x64_bin.tar.gz
+    mv jdk-21* java21
+
+    echo 'export JAVA_HOME=/opt/java21' >> ~/.bashrc
+    echo 'export PATH=$JAVA_HOME/bin:$PATH' >> ~/.bashrc
+    source ~/.bashrc
+
     java -version
-    echo ""
+    success "Java installed"
     ;;
-    
+
   3)
-    echo ""
-    warning "This will install Cloudflared..."
-    read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-      error "Cancelled!"
-      exit 1
-    fi
-    
-    log "Installing Cloudflared using binary method..."
-    
+    warning "Installing Cloudflared..."
+
     ARCH=$(uname -m)
-    if [ "$ARCH" = "x86_64" ]; then
-      CLOUDFLARED_ARCH="amd64"
-    elif [ "$ARCH" = "aarch64" ]; then
-      CLOUDFLARED_ARCH="arm64"
-    elif [ "$ARCH" = "armv7l" ]; then
-      CLOUDFLARED_ARCH="arm"
-    else
-      error "Unsupported architecture: $ARCH"
-      exit 1
-    fi
-    
-    log "Downloading cloudflared for ${CLOUDFLARED_ARCH}..."
-    curl -sSL "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-${CLOUDFLARED_ARCH}" -o /usr/local/bin/cloudflared
-    
+
+    case $ARCH in
+      x86_64) CF="amd64" ;;
+      aarch64) CF="arm64" ;;
+      armv7l) CF="arm" ;;
+      *) error "Unsupported arch"; exit 1 ;;
+    esac
+
+    curl -fsSL "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-$CF" -o /usr/local/bin/cloudflared
+
     chmod +x /usr/local/bin/cloudflared
-    
-    if command -v cloudflared &> /dev/null; then
-      success "Cloudflared installed successfully!"
-      echo ""
+
+    if command -v cloudflared >/dev/null; then
+      success "Cloudflared installed"
       cloudflared --version
     else
-      error "Failed to install Cloudflared!"
-      exit 1
+      error "Install failed"
     fi
-    
-    echo ""
-    echo -e "${CYAN}Usage:${NC}"
-    echo -e "  cloudflared tunnel --url localhost:3000"
-    echo ""
     ;;
-    
+
   4)
-    optional_packages_menu
+    optional_menu
     ;;
-    
+
   5)
-    echo ""
-    echo -e "${MAGENTA}▓▓▓ SYSTEM HEALTH CHECK ▓▓▓${NC}"
-    echo ""
-    echo -e "${CYAN}Memory Usage:${NC}"
-    free -h | awk '/Mem:/ {printf "  Used: %s / Total: %s (%.0f%%)\n", $3, $2, ($3/$2)*100}'
-    echo ""
-    echo -e "${CYAN}Disk Usage:${NC}"
-    df -h / | awk 'NR==2 {printf "  Used: %s / Total: %s (%s)\n", $3, $2, $5}'
-    echo ""
-    echo -e "${CYAN}CPU Load:${NC}"
-    uptime | awk -F'load average:' '{print "  " $2}'
-    echo ""
+    echo "RAM:"
+    free -h | awk '/Mem:/ {print $3"/"$2}'
+
+    echo "Disk:"
+    df -h /
+
+    echo "CPU:"
+    uptime
     ;;
-    
+
   6)
-    echo ""
-    warning "This will clean temporary files..."
-    read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
-      log "Cleaning apt cache..."
-      apt clean all
-      log "Removing old logs..."
-      find /var/log -type f -name "*.log" -delete 2>/dev/null
-      rm -rf /tmp/* 2>/dev/null
-      success "System cleaned successfully!"
-    else
-      error "Cancelled!"
-    fi
-    echo ""
+    warning "Cleaning system..."
+    apt clean
+    rm -rf /tmp/* 2>/dev/null
+    success "Clean done"
     ;;
-    
+
   7)
-    echo ""
-    log "Goodbye! Thanks for using JAPNEET NETWORK INSTALLER!"
-    exit 0
+    echo "Bye!"
+    exit
     ;;
-    
+
   *)
-    error "Invalid option! Please select 1-7"
+    error "Invalid option"
     ;;
 esac

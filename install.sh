@@ -74,8 +74,9 @@ case $option in
     echo -e "${GREEN}[✓] Java 21 Installed!${NC}"
     java -version
     ;;
-    
-   3)
+
+  3)
+  
     echo ""
     echo -e "${CYAN}[+] Fixing Package Manager...${NC}"
     dpkg --configure -a

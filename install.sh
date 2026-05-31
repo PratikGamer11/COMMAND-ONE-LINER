@@ -292,7 +292,10 @@ optional_packages_menu() {
   done
 }
 
+# ==========================================
 # MAIN SCRIPT
+# ==========================================
+
 header
 system_info
 main_menu
@@ -434,5 +437,34 @@ case $option in
     df -h / | awk 'NR==2 {printf "  Used: %s / Total: %s (%s)\n", $3, $2, $5}'
     echo ""
     echo -e "${CYAN}CPU Load:${NC}"
-    uptime |
- ;;
+    uptime | awk -F'load average:' '{print "  " $2}'
+    echo ""
+    ;;
+    
+  6)
+    echo ""
+    warning "This will clean temporary files..."
+    read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+      log "Cleaning apt cache..."
+      apt clean all
+      log "Removing old logs..."
+      find /var/log -type f -name "*.log" -delete 2>/dev/null
+      rm -rf /tmp/* 2>/dev/null
+      success "System cleaned successfully!"
+    else
+      error "Cancelled!"
+    fi
+    echo ""
+    ;;
+    
+  7)
+    echo ""
+    log "Goodbye! Thanks for using JAPNEET NETWORK INSTALLER!"
+    exit 0
+    ;;
+    
+  *)
+    error "Invalid option! Please select 1-7"
+    ;;
+esac

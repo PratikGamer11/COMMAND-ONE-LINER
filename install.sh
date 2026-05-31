@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # ==========================================
-# GT INSTALLER - FULL FIXED VERSION
+#  JAPNEET NETWORK INSTALLER
+#  FULLY FIXED VERSION
 # ==========================================
 
 # Colors
@@ -15,13 +16,18 @@ BLINK='\033[5m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-# Check Root
+# ==========================================
+#  ROOT CHECK
+# ==========================================
 if [ "$EUID" -ne 0 ]; then
-  echo -e "${RED}${BLINK}[✗] Please run as root (sudo bash installer.sh)${NC}"
+  echo -e "${RED}${BLINK}[✗] PLEASE RUN AS ROOT (sudo bash installer.sh)${NC}"
   exit 1
 fi
 
-# Functions
+# ==========================================
+#  FUNCTIONS
+# ==========================================
+
 spinner() {
   local pid=$1
   local delay=0.1
@@ -33,7 +39,7 @@ spinner() {
     sleep $delay
     ((i++))
   done
-  printf "\r[✓] Done!                 \n"
+  printf "\r[✓] DONE!                 \n"
 }
 
 log() {
@@ -52,25 +58,53 @@ warning() {
   echo -e "${YELLOW}[!] $1${NC}"
 }
 
+# ==========================================
+#  HEADER
+# ==========================================
 header() {
   clear
   echo -e "${MAGENTA}"
   cat << 'EOF'
-  ██████╗ ███████╗████████╗██████╗  ██████╗ 
-  ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔═══██╗
-  ██║  ██║█████╗     ██║   ██████╔╝██║   ██║
-  ██║  ██║██╔══╝     ██║   ██╔══██╗██║   ██║
-  ██████╔╝███████╗   ██║   ██║  ██║╚██████╔╝
-  ╚═════╝ ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ 
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║     JJJJJJJJJJJ    AAAAPPPPPPPPPPPPPP   NNNNNNNNNNNNNNNN   EEEEEEEEEEE    ║
+║        JJJ        AAAAPPPPPPPPPPPPPP   NNNNNNNNNNNNNNNNNNN   EEEEEEEEEEE    ║
+║        JJJ       AAPPPPPPPPPPPPPPPP    NNNNNNNNNNNNNNNNNNN   EEEEEEEEEEE    ║
+║        JJJ      AAPPPP    PPPPPP     NNNNN     NNNNNNN   EEE          ║
+║        JJJ     AAPPPPP   PPPPPP      NNNNN     NNNNNNN   EEEEEEEE      ║
+║        JJJ    AAPPPPPPP  PPPPPP      NNNNN     NNNNNNN   EEEEEEEE      ║
+║        JJJ   AAPPPPPPPPPPPPPP       NNNNN     NNNNNNN   EEEEEEEE      ║
+║        JJJ   AAPPPPPPPPPPPPPP       NNNNN     NNNNNNN   EEE          ║
+║     JJJJJJJ   AAPPPPP     PPPPPP    NNNNN     NNNNNNN   EEEEEEEEEEE    ║
+║     JJJJJJ    AAAAPP       PPPPPP   NNNNN     NNNNNNN   EEEEEEEEEEE    ║
+║                                                                           ║
+║                     NNNNNNNNNN     EEEEEEEEEEE   TTTTTTTTTTTTTTT      ║
+║                     NNNNNNNNNN     EEEEEEEEEEE   TTTTTTTTTTTTTTT      ║
+║                     NNNNNNNNNN     EEEEEEEEEEE   TTTTTTTTTTTTTTT      ║
+║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
+║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
+║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
+║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
+║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
+║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
+║                     NNNNNNNNNN     EEEEEEEEEEE        TTTTTT          ║
+║                                                                           ║
+║                         NETWORK                                      ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
 EOF
-  echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
-  echo -e "${WHITE}${BOLD}              GT INSTALLER${NC}"
-  echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
+  echo -e "${CYAN}═══════════════════════════════════════════════════════════════════════════${NC}"
+  echo -e "${WHITE}${BOLD}                      JAPNEET NETWORK INSTALLER                       ${NC}"
+  echo -e "${CYAN}═══════════════════════════════════════════════════════════════════════════${NC}"
   echo ""
 }
 
+# ==========================================
+#  SYSTEM INFO
+# ==========================================
 system_info() {
-  echo -e "${MAGENTA}▓▓▓ SYSTEM INFORMATION ▓▓▓${NC}"
+  echo -e "${MAGENTA}███████████████████████████ SYSTEM INFORMATION ███████████████████████████${NC}"
+  echo ""
   echo -e "  ${WHITE}OS:${NC}       $(grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '"')"
   echo -e "  ${WHITE}Kernel:${NC}   $(uname -r)"
   echo -e "  ${WHITE}RAM:${NC}      $(free -h | awk '/Mem:/ {print $2}')"
@@ -80,20 +114,231 @@ system_info() {
   echo ""
 }
 
+# ==========================================
+#  MAIN MENU
+# ==========================================
 main_menu() {
-  echo -e "${MAGENTA}▓▓▓▓▓▓▓▓▓▓▓ MAIN MENU ▓▓▓▓▓▓▓▓▓▓▓${NC}"
+  echo -e "${MAGENTA}███████████████████████████████ MAIN MENU █████████████████████████████${NC}"
   echo ""
-  echo -e "  ${CYAN}[1]${NC} ${WHITE}Install Panel${NC}              - Setup game panel"
-  echo -e "  ${CYAN}[2]${NC} ${WHITE}Install Java 21${NC}            - Java runtime"
-  echo -e "  ${CYAN}[3]${NC} ${WHITE}Install Cloudflared${NC}       - Tunnel service"
-  echo -e "  ${CYAN}[4]${NC} ${WHITE}Optional Packages${NC}         - Additional tools"
-  echo -e "  ${CYAN}[5]${NC} ${WHITE}System Health Check${NC}        - Check system status"
-  echo -e "  ${CYAN}[6]${NC} ${WHITE}Cleanup System${NC}            - Free up space"
-  echo -e "  ${CYAN}[7]${NC} ${WHITE}Exit${NC}                      - Goodbye!"
+  echo -e "  ${CYAN}[1]${NC} ${WHITE}INSTALL PANEL${NC}              - Setup game panel"
+  echo -e "  ${CYAN}[2]${NC} ${WHITE}INSTALL JAVA 21${NC}            - Java runtime"
+  echo -e "  ${CYAN}[3]${NC} ${WHITE}INSTALL CLOUDFLARED${NC}       - Tunnel service"
+  echo -e "  ${CYAN}[4]${NC} ${WHITE}OPTIONAL PACKAGES${NC}         - Additional tools"
+  echo -e "  ${CYAN}[5]${NC} ${WHITE}SYSTEM HEALTH CHECK${NC}        - Check system status"
+  echo -e "  ${CYAN}[6]${NC} ${WHITE}CLEANUP SYSTEM${NC}            - Free up space"
+  echo -e "  ${CYAN}[7]${NC} ${WHITE}EXIT${NC}                      - Goodbye!"
   echo ""
 }
 
-# MAIN SCRIPT
+# ==========================================
+#  OPTIONAL PACKAGES MENU
+# ==========================================
+optional_packages_menu() {
+  while true; do
+    clear
+    echo -e "${MAGENTA}█████████████████████ OPTIONAL PACKAGES █████████████████████${NC}"
+    echo ""
+    echo -e "  ${CYAN}[1]${NC} ${WHITE}DOCKER & DOCKER COMPOSE${NC}"
+    echo -e "  ${CYAN}[2]${NC} ${WHITE}NGINX WEB SERVER${NC}"
+    echo -e "  ${CYAN}[3]${NC} ${WHITE}REDIS DATABASE${NC}"
+    echo -e "  ${CYAN}[4]${NC} ${WHITE}UFW FIREWALL${NC}"
+    echo -e "  ${CYAN}[5]${NC} ${WHITE}NANO EDITOR${NC}"
+    echo -e "  ${CYAN}[6]${NC} ${WHITE}SCREEN MANAGER${NC}"
+    echo -e "  ${CYAN}[7]${NC} ${WHITE}HTOP MONITOR${NC}"
+    echo -e "  ${CYAN}[8]${NC} ${WHITE}UPDATE SYSTEM${NC}"
+    echo -e "  ${CYAN}[9]${NC} ${WHITE}PYTHON 3 & PIP${NC}"
+    echo -e "  ${CYAN}[10]${NC} ${WHITE}GO BACK TO MAIN MENU${NC}"
+    echo ""
+    
+    read -p "  ${CYAN}Select =>${NC} " pkg
+    
+    case $pkg in
+      1)
+        echo ""
+        warning "Installing Docker & Docker Compose..."
+        log "Updating packages..."
+        apt update -y
+        
+        log "Installing dependencies..."
+        apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+        
+        log "Adding Docker GPG key..."
+        mkdir -p /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        
+        log "Adding Docker repository..."
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+        
+        log "Updating packages..."
+        apt update -y
+        
+        log "Installing Docker..."
+        apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        
+        log "Starting Docker..."
+        systemctl start docker
+        systemctl enable docker
+        
+        success "Docker installed successfully!"
+        docker --version
+        docker-compose --version
+        
+        echo ""
+        read -p "Press Enter to continue..."
+        ;;
+        
+      2)
+        echo ""
+        warning "Installing Nginx..."
+        log "Updating packages..."
+        apt update -y
+        
+        log "Installing Nginx..."
+        apt install -y nginx
+        
+        log "Starting Nginx..."
+        systemctl start nginx
+        systemctl enable nginx
+        
+        success "Nginx installed successfully!"
+        nginx -v
+        
+        echo ""
+        read -p "Press Enter to continue..."
+        ;;
+        
+      3)
+        echo ""
+        warning "Installing Redis..."
+        log "Updating packages..."
+        apt update -y
+        
+        log "Installing Redis..."
+        apt install -y redis-server
+        
+        log "Starting Redis..."
+        systemctl start redis-server
+        systemctl enable redis-server
+        
+        success "Redis installed successfully!"
+        redis-server --version
+        
+        echo ""
+        read -p "Press Enter to continue..."
+        ;;
+        
+      4)
+        echo ""
+        warning "Installing UFW Firewall..."
+        log "Updating packages..."
+        apt update -y
+        
+        log "Installing UFW..."
+        apt install -y ufw
+        
+        success "UFW installed successfully!"
+        ufw --version
+        
+        echo ""
+        read -p "Press Enter to continue..."
+        ;;
+        
+      5)
+        echo ""
+        warning "Installing Nano..."
+        log "Updating packages..."
+        apt update -y
+        
+        log "Installing Nano..."
+        apt install -y nano
+        
+        success "Nano installed successfully!"
+        nano --version
+        
+        echo ""
+        read -p "Press Enter to continue..."
+        ;;
+        
+      6)
+        echo ""
+        warning "Installing Screen..."
+        log "Updating packages..."
+        apt update -y
+        
+        log "Installing Screen..."
+        apt install -y screen
+        
+        success "Screen installed successfully!"
+        screen --version
+        
+        echo ""
+        read -p "Press Enter to continue..."
+        ;;
+        
+      7)
+        echo ""
+        warning "Installing Htop..."
+        log "Updating packages..."
+        apt update -y
+        
+        log "Installing Htop..."
+        apt install -y htop
+        
+        success "Htop installed successfully!"
+        htop --version
+        
+        echo ""
+        read -p "Press Enter to continue..."
+        ;;
+        
+      8)
+        echo ""
+        warning "Updating System..."
+        log "Updating package lists..."
+        apt update -y
+        
+        log "Upgrading packages..."
+        apt upgrade -y
+        
+        success "System updated successfully!"
+        
+        echo ""
+        read -p "Press Enter to continue..."
+        ;;
+        
+      9)
+        echo ""
+        warning "Installing Python 3 & Pip..."
+        log "Updating packages..."
+        apt update -y
+        
+        log "Installing Python 3 & Pip..."
+        apt install -y python3 python3-pip
+        
+        success "Python 3 installed successfully!"
+        python3 --version
+        pip3 --version
+        
+        echo ""
+        read -p "Press Enter to continue..."
+        ;;
+        
+      10)
+        break
+        ;;
+        
+      *)
+        error "Invalid option! Please select 1-10"
+        sleep 2
+        ;;
+    esac
+  done
+}
+
+# ==========================================
+#  MAIN SCRIPT START
+# ==========================================
+
 header
 system_info
 main_menu
@@ -111,13 +356,11 @@ case $option in
     fi
     
     log "Updating package lists..."
-    (apt update -y &) &
-    spinner $!
+    apt update -y
     success "Packages updated"
     
     log "Installing dependencies: git, nodejs, npm, curl, wget..."
-    (apt install -y git nodejs npm curl wget &) &
-    spinner $!
+    apt install -y git nodejs npm curl wget
     success "Dependencies installed"
     
     if [ -d "crispy-adventure" ]; then
@@ -126,8 +369,7 @@ case $option in
     fi
     
     log "Cloning Panel repository..."
-    (git clone https://github.com/pratikgamer11/crispy-adventure &) &
-    spinner $!
+    git clone https://github.com/pratikgamer11/crispy-adventure
     
     if [ ! -d "crispy-adventure" ]; then
       error "Failed to clone repository!"
@@ -138,8 +380,7 @@ case $option in
     
     if [ -f "package.json" ]; then
       log "Installing Node modules..."
-      (npm install &) &
-      spinner $!
+      npm install
     else
       warning "No package.json found, installing express..."
       npm install express
@@ -151,7 +392,7 @@ case $option in
     echo -e "${GREEN}║           PANEL INSTALLED SUCCESSFULLY!             ║${NC}"
     echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
     echo ""
-    echo -e "${YELLOW}▓▓▓ START PANEL WITH THESE COMMANDS: ▓▓▓${NC}"
+    echo -e "${YELLOW}█████████████████ START PANEL WITH THESE COMMANDS: █████████████████${NC}"
     echo ""
     echo -e "${CYAN}  cd crispy-adventure${NC}"
     echo -e "${CYAN}  node .${NC}"
@@ -170,9 +411,11 @@ case $option in
       exit 1
     fi
     
+    log "Updating packages..."
+    apt update -y
+    
     log "Installing Java 21 JDK..."
-    (apt install -y openjdk-21-jdk &) &
-    spinner $!
+    apt install -y openjdk-21-jdk
     success "Java 21 installed"
     echo ""
     java -version
@@ -188,266 +431,51 @@ case $option in
       exit 1
     fi
     
-    log "Installing Cloudflared..."
-    dpkg --configure -a
-    apt install -f -y
-    mkdir -p --mode=0755 /usr/share/keyrings
-    (curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg &) &
-    spinner $!
-    echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' | tee /etc/apt/sources.list.d/cloudflared.list
-    (apt update -y &) &
-    spinner $!
-    (apt install -y cloudflared &) &
-    spinner $!
-    success "Cloudflared installed!"
+    log "Installing Cloudflared using binary method..."
+    
+    # Check architecture
+    ARCH=$(uname -m)
+    if [ "$ARCH" = "x86_64" ]; then
+      CLOUDFLARED_ARCH="amd64"
+    elif [ "$ARCH" = "aarch64" ]; then
+      CLOUDFLARED_ARCH="arm64"
+    elif [ "$ARCH" = "armv7l" ]; then
+      CLOUDFLARED_ARCH="arm"
+    else
+      error "Unsupported architecture: $ARCH"
+      exit 1
+    fi
+    
+    # Download cloudflared
+    log "Downloading cloudflared for ${CLOUDFLARED_ARCH}..."
+    curl -sSL "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-${CLOUDFLARED_ARCH}" -o /usr/local/bin/cloudflared
+    
+    # Make executable
+    chmod +x /usr/local/bin/cloudflared
+    
+    # Verify installation
+    if command -v cloudflared &> /dev/null; then
+      success "Cloudflared installed successfully!"
+      echo ""
+      cloudflared --version
+    else
+      error "Failed to install Cloudflared!"
+      exit 1
+    fi
+    
     echo ""
-    echo -e "${CYAN}Commands:${NC}"
+    echo -e "${CYAN}USAGE:${NC}"
     echo -e "  cloudflared tunnel --url localhost:3000"
     echo ""
     ;;
     
   4)
-    clear
-    echo -e "${MAGENTA}═══════════════════════════════════════════════${NC}"
-    echo -e "${WHITE}          OPTIONAL PACKAGES                 ${NC}"
-    echo -e "${MAGENTA}═══════════════════════════════════════════════${NC}"
-    echo ""
-    echo -e "  ${CYAN}[1]${NC} ${WHITE}Docker & Docker Compose${NC}"
-    echo -e "  ${CYAN}[2]${NC} ${WHITE}Nginx Web Server${NC}"
-    echo -e "  ${CYAN}[3]${NC} ${WHITE}Redis Database${NC}"
-    echo -e "  ${CYAN}[4]${NC} ${WHITE}UFW Firewall${NC}"
-    echo -e "  ${CYAN}[5]${NC} ${WHITE}Nano Editor${NC}"
-    echo -e "  ${CYAN}[6]${NC} ${WHITE}Screen Manager${NC}"
-    echo -e "  ${CYAN}[7]${NC} ${WHITE}Htop Monitor${NC}"
-    echo -e "  ${CYAN}[8]${NC} ${WHITE}Update System${NC}"
-    echo -e "  ${CYAN}[9]${NC} ${WHITE}Python 3 & Pip${NC}"
-    echo -e "  ${CYAN}[10]${NC} ${WHITE}Go Back${NC}"
-    echo ""
-    
-    read -p "  ${CYAN}Select =>${NC} " pkg
-    
-    case $pkg in
-      1)
-        echo ""
-        warning "Installing Docker & Docker Compose..."
-        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-          error "Cancelled!"
-          exit 1
-        fi
-        
-        log "Updating packages..."
-        apt update
-        
-        log "Installing dependencies..."
-        apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
-        
-        log "Adding Docker GPG key..."
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-        
-        log "Adding Docker repository..."
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list
-        
-        log "Updating packages..."
-        apt update
-        
-        log "Installing Docker..."
-        apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-        
-        log "Starting Docker..."
-        systemctl start docker
-        systemctl enable docker
-        
-        success "Docker installed successfully!"
-        echo ""
-        docker --version
-        docker-compose --version
-        ;;
-        
-      2)
-        echo ""
-        warning "Installing Nginx..."
-        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-          error "Cancelled!"
-          exit 1
-        fi
-        
-        log "Updating packages..."
-        apt update
-        
-        log "Installing Nginx..."
-        apt install -y nginx
-        
-        log "Starting Nginx..."
-        systemctl start nginx
-        systemctl enable nginx
-        
-        success "Nginx installed successfully!"
-        echo ""
-        nginx -v
-        ;;
-        
-      3)
-        echo ""
-        warning "Installing Redis..."
-        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-          error "Cancelled!"
-          exit 1
-        fi
-        
-        log "Updating packages..."
-        apt update
-        
-        log "Installing Redis..."
-        apt install -y redis-server
-        
-        log "Starting Redis..."
-        systemctl start redis-server
-        systemctl enable redis-server
-        
-        success "Redis installed successfully!"
-        echo ""
-        redis-server --version
-        ;;
-        
-      4)
-        echo ""
-        warning "Installing UFW Firewall..."
-        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-          error "Cancelled!"
-          exit 1
-        fi
-        
-        log "Updating packages..."
-        apt update
-        
-        log "Installing UFW..."
-        apt install -y ufw
-        
-        success "UFW installed successfully!"
-        echo ""
-        ufw --version
-        ;;
-        
-      5)
-        echo ""
-        warning "Installing Nano..."
-        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-          error "Cancelled!"
-          exit 1
-        fi
-        
-        log "Updating packages..."
-        apt update
-        
-        log "Installing Nano..."
-        apt install -y nano
-        
-        success "Nano installed successfully!"
-        echo ""
-        nano --version
-        ;;
-        
-      6)
-        echo ""
-        warning "Installing Screen..."
-        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-          error "Cancelled!"
-          exit 1
-        fi
-        
-        log "Updating packages..."
-        apt update
-        
-        log "Installing Screen..."
-        apt install -y screen
-        
-        success "Screen installed successfully!"
-        echo ""
-        screen --version
-        ;;
-        
-      7)
-        echo ""
-        warning "Installing Htop..."
-        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-          error "Cancelled!"
-          exit 1
-        fi
-        
-        log "Updating packages..."
-        apt update
-        
-        log "Installing Htop..."
-        apt install -y htop
-        
-        success "Htop installed successfully!"
-        echo ""
-        htop --version
-        ;;
-        
-      8)
-        echo ""
-        warning "Updating System..."
-        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-          error "Cancelled!"
-          exit 1
-        fi
-        
-        log "Updating package lists..."
-        (apt update -y &) &
-        spinner $!
-        
-        log "Upgrading packages..."
-        (apt upgrade -y &) &
-        spinner $!
-        
-        success "System updated successfully!"
-        ;;
-        
-      9)
-        echo ""
-        warning "Installing Python 3 & Pip..."
-        read -p "  DO YOU WANT TO CONTINUE = [Y/N]: " confirm
-        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-          error "Cancelled!"
-          exit 1
-        fi
-        
-        log "Updating packages..."
-        apt update
-        
-        log "Installing Python 3 & Pip..."
-        apt install -y python3 python3-pip
-        
-        success "Python 3 installed successfully!"
-        echo ""
-        python3 --version
-        pip3 --version
-        ;;
-        
-      10)
-        echo ""
-        log "Going back..."
-        main
-        ;;
-        
-      *)
-        error "Invalid option!"
-        ;;
-    esac
+    optional_packages_menu
     ;;
     
   5)
     echo ""
-    echo -e "${MAGENTA}▓▓▓ SYSTEM HEALTH CHECK ▓▓▓${NC}"
+    echo -e "${MAGENTA}█████████████████ SYSTEM HEALTH CHECK ███████████████████${NC}"
     echo ""
     echo -e "${CYAN}Memory Usage:${NC}"
     free -h | awk '/Mem:/ {printf "  Used: %s / Total: %s (%.0f%%)\n", $3, $2, ($3/$2)*100}'
@@ -455,5 +483,3 @@ case $option in
     echo -e "${CYAN}Disk Usage:${NC}"
     df -h / | awk 'NR==2 {printf "  Used: %s / Total: %s (%s)\n", $3, $2, $5}'
     echo ""
-    echo -e "${CYAN}CPU Load:${NC}"
-    uptime | awk -F'load average:' '{print "

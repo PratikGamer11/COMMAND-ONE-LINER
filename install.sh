@@ -102,8 +102,39 @@ case $option in
         echo -e "${RED}[✗] Cloudflared installation failed.${NC}"
     fi
     ;;
+  4)4. clear
+   echo -e "${CYAN}════════════════════════════════════${NC}"
+   echo -e "${WHITE}       OPTIONAL PACKAGES${NC}"
+   echo -e "${CYAN}════════════════════════════════════${NC}"
 
-  4)
+   echo ""
+   echo "[1] Docker"
+   echo "[2] Nginx"
+   echo "[3] Redis"
+   echo "[4] UFW Firewall"
+   echo "[5] Nano"
+   echo "[6] Screen"
+   echo "[7] Htop"
+   echo "[8] Update System"
+   echo ""
+
+   read -p "Select Package => " pkg
+
+   case $pkg in
+
+   1. curl -fsSL https://get.docker.com | sh ;;
+   2. apt install -y nginx ;;
+   3. apt install -y redis-server ;;
+   4. apt install -y ufw ;;
+   5. apt install -y nano ;;
+   6. apt install -y screen ;;
+   7. apt install -y htop ;;
+   8. apt update -y && apt upgrade -y ;;
+      *) echo "Invalid Option!" ;;
+      esac
+      ;;
+
+  5)
     echo -e "${GREEN}Bye!${NC}"
     exit 0
     ;;
